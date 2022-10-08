@@ -4,7 +4,7 @@ import Graph_Gaussian_Models as Model
 
 #torch.manual_seed(12346)
 ## Cuda selection
-use_gpu = False
+use_gpu = True
 
 ## Use Cuda or not
 device = torch.device('cuda:0' if (use_gpu & torch.cuda.is_available()) else 'cpu')
@@ -15,14 +15,13 @@ num_node,feat,posidx,negidx,adj,train_adj,train_posidx,train_negidx,test_posidx,
 print("The edge rates of the dataset used now is: ")
 print(posidx.shape[1]/(num_node**2-num_node))
 
-model = Model.GCGP(feat,3)
-
 ## Move to gpu
-
-model = model.to(device)
 feat,posidx,adj,train_adj,train_posidx,test_posidx,valid_posidx,train_nlap = feat.to(device),\
     posidx.to(device),adj.to(device),train_adj.to(device),train_posidx.to(device),test_posidx.to(device),\
         valid_posidx.to(device),train_nlap.to(device)
+
+model = Model.EdgeGCGP(feat,3)
+model.to(device)
 
 print('Now start training')
 

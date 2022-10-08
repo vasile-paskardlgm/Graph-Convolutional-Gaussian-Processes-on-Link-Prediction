@@ -6,20 +6,20 @@ from sklearn.metrics import average_precision_score, roc_auc_score
 class GCGP(torch.nn.Module):
     def __init__(self, x_train, hops):
         super(GCGP, self).__init__()
-        self.graphconv1 = APPNP(hops,0.5)
-        self.graphconv2 = APPNP(hops,0.5)
-        self.x_train = x_train
-        self.kernel_scale = torch.nn.Linear(x_train.shape[1],1,False)
+        self.graphconv1 = APPNP(hops,0.5).to(torch.device('cuda:0' ))
+        self.graphconv2 = APPNP(hops,0.5).to(torch.device('cuda:0' ))
+        self.x_train = x_train.to(torch.device('cuda:0' ))
+        self.kernel_scale = torch.nn.Linear(x_train.shape[1],1,False).to(torch.device('cuda:0' ))
         self.kernel = self.RBF_kernel
 
     def RBF_kernel(self,input):
-        var = torch.zeros((input.shape[0],input.shape[0]))
-
+        var = torch.zeros((input.shape[0],input.shape[0])).to(torch.device('cuda:0' ))
+        input.to(torch.device('cuda:0' ))
         for i in range(0,input.shape[0]-1):
             for j in range(i+1,input.shape[0]):
                 var[i,j] = self.kernel_scale((input[i,:]-input[j,:]) * (input[i,:]-input[j,:]))
         
-        var = var + var.T + torch.eye(input.shape[0])
+        var = var + var.T + torch.eye(input.shape[0]).to(torch.device('cuda:0' ))
 
         return var
 
